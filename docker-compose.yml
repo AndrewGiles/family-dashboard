@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  react:
+    build:
+      context: ./client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+    environment:
+      REACT_APP_API_URL: http://express:3000  # Use the service name 'express' as the host
+  express:
+    build:
+      context: ./server
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./server:/app
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      NODE_ENV: development
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./client/.next:/usr/share/nginx/html
+volumes:
+  mongodb-data:
